@@ -1,23 +1,18 @@
 const Airtable = require("airtable");
-const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(
-  process.env.AIRTABLE_BASE
-);
+const { AIRTABLE_API_KEY, AIRTABLE_BASE } = process.env;
 
-const table = base("coffee-stores");
+const base = new Airtable({ apiKey: AIRTABLE_API_KEY }).base(AIRTABLE_BASE);
+const coffeeStoresTable = base("coffee-stores");
 
-const getMinifiedRecord = (record) => {
-  return {
-    recordId: record.id,
-    ...record.fields,
-  };
-};
+const getMinifiedRecord = (record) => ({
+  recordId: record.id,
+  ...record.fields,
+});
 
-const getMinifiedRecords = (records) => {
-  return records.map((record) => getMinifiedRecord(record));
-};
+const getMinifiedRecords = (records) => records.map(getMinifiedRecord);
 
 const findRecordByFilter = async (id) => {
-  const findCoffeeStoreRecords = await table
+  const findCoffeeStoreRecords = await coffeeStoresTable
     .select({
       filterByFormula: `id="${id}"`,
     })
@@ -26,4 +21,4 @@ const findRecordByFilter = async (id) => {
   return getMinifiedRecords(findCoffeeStoreRecords);
 };
 
-export { table, getMinifiedRecords, findRecordByFilter };
+module.exports = { coffeeStoresTable, getMinifiedRecords, findRecordByFilter };
